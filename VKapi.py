@@ -5,6 +5,7 @@ from time import sleep
 from progress.bar import IncrementalBar
 import datetime
 import docx
+import requests
 from argparse import ArgumentParser
 import shutil
 from dateutil.relativedelta import relativedelta
@@ -15,19 +16,17 @@ required_group.add_argument('-id', '--user_id',
                             help='user id (required)')
 parser.add_argument('-d', '--include_deactivated', action='store_true',
                     help='include deactivated users')
-parser.add_argument('-name', '--album_filename', action='store_true', default='album',
+parser.add_argument('-name', '--album_filename', action='store', default='album',
                     help='specify album filename')
 
 args = parser.parse_args()
 
 # https://oauth.vk.com/authorize?client_id=7815028&display=page&redirect_uri=http://oauth.vk.com/blank.html&scope=friends&response_type=token&v=5.130
 
-
-access_token = '45ce383bbb25fa1de73091c43cbf47a6f415140e8ea1536ffc966e1e63e4dc25e34d18612ec514d6ddcf6'
+access_token = '64d1b5e5d8cfd917a1de7d3700da4d859f8ae22d0283c7e7ce90aaca55153fa135f9fad1546af9d5bcbbb'
 session = vk.Session(access_token=access_token)
 vkapi = vk.API(session)
 ids = vkapi.friends.get(user_id=args.user_id, v='5.130')
-
 bar = IncrementalBar('Processing... ', max = ids['count'])
 
 
@@ -61,7 +60,7 @@ for id in ids['items']:
         print(datetime.datetime.now())
         print(info[0]['bdate'])
     document.add_paragraph('Ж' if info[0]['sex'] == 1 else 'М')
-    document.save(os.getcwd()+'/album.docx')
+    document.save(os.getcwd()+'/' + args.album_filename + '.docx')
 
 shutil.rmtree(os.getcwd()+'/tmp')
 bar.finish()
